@@ -44,8 +44,10 @@ public class LoginRequestHandler extends ChannelInboundHandlerAdapter {
             @Override
             public void onBack(Boolean r) {
                 if (r) {
+                    ctx.pipeline().addAfter("loginRequestHandler", "heartBeatServerHandler", heartBeatServerHandler);
                     ctx.pipeline().remove("loginRequestHandler");
                     System.out.println("login has removed");
+
                 }
             }
 

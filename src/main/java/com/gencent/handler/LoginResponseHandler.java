@@ -45,7 +45,6 @@ public class LoginResponseHandler extends ChannelInboundHandlerAdapter {
                     ctx.channel().attr(ClientSession.SESSION_KEY).get();
             session.setSessionId(message.getSessionId());
             session.setLogin(true);
-            client.setLoginFlag(true);
             System.out.println(session);
             client.notifyCommandThread();
             ctx.channel().pipeline().addAfter("loginResponseHandler", "heartBeatClientHandler", heartBeatClientHandler);

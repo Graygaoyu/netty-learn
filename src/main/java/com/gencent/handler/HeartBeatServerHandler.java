@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @ChannelHandler.Sharable
 public class HeartBeatServerHandler extends IdleStateHandler {
 
-    private static final int READ_IDLE_GAP = 1500;
+    private static final int READ_IDLE_GAP = 10;
 
     private SessionManager sessionManager;
 
@@ -43,28 +43,8 @@ public class HeartBeatServerHandler extends IdleStateHandler {
                 .setSessionId(sessionManager.getSession(uid).getSessionId())
                 .setSequence(1L)
                 .setHeartBeat(heartBeat).build();
-
-
-        CallbackTaskScheduler.add(new CallbackTask<Boolean>() {
-            @Override
-            public Boolean execute() throws Exception {
-                if (ctx.channel().isActive())
-                {
-                    ctx.writeAndFlush(heartBeatMessage);
-                }
-                return true;
-            }
-
-            @Override
-            public void onBack(Boolean aBoolean) {
-
-            }
-
-            @Override
-            public void onException(Throwable t) {
-
-            }
-        });
+        System.out.println(heartBeatMessage);
+        ctx.writeAndFlush(heartBeatMessage);
     }
 
     @Override

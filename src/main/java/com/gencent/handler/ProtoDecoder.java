@@ -16,9 +16,9 @@ public class ProtoDecoder extends ByteToMessageDecoder {
             return;
         }
         short magic = in.readShort();
-        System.out.println(magic);
+//        System.out.println(magic);
         short version = in.readShort();
-        System.out.println(version);
+//        System.out.println(version);
         int length = in.readInt();
         if (length < 0) {
             return;
@@ -40,7 +40,7 @@ public class ProtoDecoder extends ByteToMessageDecoder {
         }
 
         MessageProto.Message message = MessageProto.Message.parseFrom(array);
-        System.out.println(message);
+//        System.out.println(message);
         if (in.hasArray())
             in.release();
         if (message != null)

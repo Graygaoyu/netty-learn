@@ -35,12 +35,19 @@ public class ClientSession {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
-    public ClientSession() {}
-
-    public ClientSession(Channel channel)
-    {
-        this.channel = channel;
+    public ClientSession() {
         this.sessionId = "null";
+    }
+
+//    public ClientSession(Channel channel)
+//    {
+//        this.channel = channel;
+//        this.sessionId = "null";
+//        channel.attr(ClientSession.SESSION_KEY).set(this);
+//    }
+
+    public synchronized void setChannal(Channel channel) {
+        this.channel = channel;
         channel.attr(ClientSession.SESSION_KEY).set(this);
     }
 
@@ -81,20 +88,15 @@ public class ClientSession {
 
     public synchronized void close()
     {
+        System.out.println("closeListener called");
+        System.out.println("channel closed");
+        channel.attr(ClientSession.SESSION_KEY).set(null);
+        channel = null;
+        sessionId = "null";
         isConnected = false;
+        loginCount = 0;
+        System.exit(-2);
 
-        ChannelFuture future = channel.close();
-        future.addListener(new ChannelFutureListener()
-        {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception
-            {
-                if (future.isSuccess())
-                {
-                    // TODO
-                }
-            }
-        });
     }
 
 }

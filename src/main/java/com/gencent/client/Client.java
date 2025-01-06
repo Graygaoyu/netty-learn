@@ -38,8 +38,10 @@ public class Client {
     private CallbackTask<Void> loginFailedTask = new CallbackTask<Void>() {
         @Override
         public Void execute() throws Exception {
-            loginFailedPostProcess();
-            loginFlag = false;
+            session.setLogin(false);
+            session.setLoginCount(session.getLoginCount()+1);
+            System.out.println("failure time "+session.getLoginCount());
+            notifyCommandThread();
             return null;
         }
 
@@ -57,22 +59,19 @@ public class Client {
     private GenericFutureListener<ChannelFuture> closeListener = new GenericFutureListener<ChannelFuture>() {
         @Override
         public void operationComplete(ChannelFuture channelFuture) throws Exception {
-//            channel = channelFuture.channel();
-//            ClientSession session =
-//                    channel.attr(ClientSession.SESSION_KEY).get();
-//            session.close();
-//            connectFlag = false;
-//            setLoginTime(0);
-//            System.out.println("closeListener called");
-//            System.out.println("channel closed");
+            channel = channelFuture.channel();
+            ClientSession session =
+                    channel.attr(ClientSession.SESSION_KEY).get();
+            session.close();
+
 //            //唤醒用户线程
-//            notifyCommandThread();
+            notifyCommandThread();
         }
     };
 
-    private synchronized void setLoginTime(int loginTime) {
-        this.loginTime.set(loginTime);
-    }
+//    private synchronized void setLoginTime(int loginTime) {
+//        this.loginTime.set(loginTime);
+//    }
 
     // nio线程调用
     private GenericFutureListener<ChannelFuture> connectedListener = new GenericFutureListener<ChannelFuture>() {
@@ -86,19 +85,20 @@ public class Client {
                         TimeUnit.SECONDS);
                 session.incrementConnectCount();
                 session.setIsConnected(false);
+                System.out.println("connect failed num "+session.getConnectCount());
             } else if (channelFuture.isSuccess()) {
-                connectFlag = true;
+                session.setIsConnected(true);
                 channel = channelFuture.channel();
                 channel.closeFuture().addListener(closeListener);
-
-                session = new ClientSession(channel);
-                session.setConnected(true);
-
+                session.setChannal(channel);
+                System.out.println("connect success");
                 notifyCommandThread();
             } else {
-                connectFlag = false;
+                session.setIsConnected(false);
+                System.out.println(" Max connect time!");
                 //唤醒用户线程
-                notifyCommandThread();
+//                notifyCommandThread();
+                System.exit(-1);
             }
         }
     };
@@ -122,10 +122,10 @@ public class Client {
         this.notify();
     }
 
-    public synchronized void loginFailedPostProcess() {
-        loginTime.incrementAndGet();
-        this.notify();
-    }
+//    public synchronized void loginFailedPostProcess() {
+//        loginTime.incrementAndGet();
+//        this.notify();
+//    }
 
     private void init() {
         scanner = new Scanner(System.in);
@@ -160,8 +160,9 @@ public class Client {
             if (session.needLogin()) {
                 userLogin();
             } else {
-                System.out.println(" channel close do");
+                System.out.println("channel close do");
                 channel.close();
+                waitCommandThread();
             }
             while (session.isLogin())
             {
@@ -193,14 +194,15 @@ public class Client {
         user.setUserId(loginConsoleCommand.getUserName());
         user.setToken(loginConsoleCommand.getPassword());
         System.out.println("user " + user);
-
         System.out.println("start to login");
         this.user = user;
         session.setUser(user);
+
         loginSender = new LoginSender();
         loginSender.setUser(user);
         loginSender.setSession(session);
         loginSender.sendLoginMsg();
+
         waitCommandThread();
     }
 

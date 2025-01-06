@@ -12,7 +12,7 @@ public class LoginSender extends BaseSender{
         MessageProto.Message message =
                 MessageProto.Message.newBuilder()
                         .setType(MessageProto.HeadType.LOGIN_REQUEST)
-                        .setSequence(1)
+                        .setSequence(System.currentTimeMillis())
                         .setSessionId(getSession().getSessionId())
                         .setLoginRequest(
                                 MessageProto.LoginRequest.newBuilder()
