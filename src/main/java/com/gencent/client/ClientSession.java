@@ -3,14 +3,12 @@ package com.gencent.client;
 import com.gencent.pojo.User;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.gencent.config.Config.SESSION_KEY_NAME;
 
@@ -21,9 +19,11 @@ public class ClientSession {
 
     private User user;
 
+    private NettyClient nettyClient;
+
     private Channel channel;
 
-    private String sessionId;
+    private String sessionId = "-1";
 
     private boolean isConnected = false;
 
@@ -35,32 +35,51 @@ public class ClientSession {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
+    private ClientState state;
+
     public ClientSession() {
-        this.sessionId = "null";
+        state = ClientState.INIT;
     }
 
-//    public ClientSession(Channel channel)
-//    {
-//        this.channel = channel;
-//        this.sessionId = "null";
-//        channel.attr(ClientSession.SESSION_KEY).set(this);
-//    }
+    // 发起连接到服务器
+    public void connectToServer() {
+//        nettyClient.bind();
+//        nettyClient.setConnectedListener(   );
+//        nettyClient.connect();
+    }
 
-    public synchronized void setChannal(Channel channel) {
+    // 绑定通道
+    public synchronized void bindChannel(Channel channel) {
         this.channel = channel;
         channel.attr(ClientSession.SESSION_KEY).set(this);
     }
 
+    // 发送数据
     public ChannelFuture witeAndFlush(Object pkg)
     {
         return channel.writeAndFlush(pkg);
     }
 
+    // 发起关闭会话
+    public synchronized void close()
+    {
+        System.out.println("closeListener called");
+        System.out.println("channel closed");
+        channel.attr(ClientSession.SESSION_KEY).set(null);
+        channel = null;
+        sessionId = "null";
+        isConnected = false;
+        loginCount = 0;
+    }
+
+    // 根据Context获取会话
     public static ClientSession getSession(ChannelHandlerContext ctx)
     {
         Channel channel = ctx.channel();
         return channel.attr(ClientSession.SESSION_KEY).get();
     }
+
+
 
     public synchronized boolean isConnected() {
         return isConnected;
@@ -86,17 +105,8 @@ public class ClientSession {
         return !isConnected && connectCount < 3;
     }
 
-    public synchronized void close()
-    {
-        System.out.println("closeListener called");
-        System.out.println("channel closed");
-        channel.attr(ClientSession.SESSION_KEY).set(null);
-        channel = null;
-        sessionId = "null";
-        isConnected = false;
-        loginCount = 0;
-        System.exit(-2);
 
-    }
+
+
 
 }

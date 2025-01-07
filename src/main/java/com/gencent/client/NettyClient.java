@@ -1,6 +1,7 @@
 package com.gencent.client;
 
 import com.gencent.concurrent.CallbackTask;
+import com.gencent.config.Config;
 import com.gencent.handler.*;
 import com.gencent.processer.ChatRedirectProcessor;
 import io.netty.bootstrap.Bootstrap;
@@ -21,6 +22,8 @@ public class NettyClient {
     private Bootstrap bootstrap;
     private GenericFutureListener<ChannelFuture> connectedListener;
 
+    private ClientSession session;
+
     private ProtoEncoder protoEncoder;
     private LoginResponseHandler loginResponseHandler;
 
@@ -33,14 +36,31 @@ public class NettyClient {
     // 服务器端口
     private int port;
 
+    // 初始化
+    public NettyClient(ClientSession session) {
+        this.session = session;
+        eventLoopGroup = new NioEventLoopGroup();
+    }
+
     public NettyClient(GenericFutureListener<ChannelFuture> connectedListener, Client client) {
         eventLoopGroup = new NioEventLoopGroup();
         this.connectedListener = connectedListener;
         this.client = client;
     }
 
-    // nio线程调用
-    public void doConnect() {
+    // 绑定端口
+    public void bind() {
+        host = Config.HOST;
+        port = Config.PORT;
+    }
+
+    // 设置监听器
+    public void setConnectedListener(GenericFutureListener<ChannelFuture> connectedListener) {
+        this.connectedListener = connectedListener;
+    }
+
+    // 连接到服务器
+    public void connect() {
         bootstrap = new Bootstrap();
         heartBeatClientHandler = new HeartBeatClientHandler();
         loginResponseHandler = new LoginResponseHandler(client, heartBeatClientHandler);

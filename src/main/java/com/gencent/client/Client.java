@@ -21,13 +21,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Data
 public class Client {
 
-    private Scanner scanner;
     private NettyClient nettyClient;
+
+    private CommandClient commandClient;
+
+    private ClientSession session;
+
     private Map<String, BaseCommand>  commandMap = new HashMap<>();
 
     private Channel channel;
 
-    private ClientSession session;
+
 
     private LoginSender loginSender;
 
@@ -90,7 +94,7 @@ public class Client {
                 session.setIsConnected(true);
                 channel = channelFuture.channel();
                 channel.closeFuture().addListener(closeListener);
-                session.setChannal(channel);
+                session.setChannel(channel);
                 System.out.println("connect success");
                 notifyCommandThread();
             } else {
@@ -128,11 +132,14 @@ public class Client {
 //    }
 
     private void init() {
-        scanner = new Scanner(System.in);
-        Thread.currentThread().setName("主线程");
-        initCommandMap();
-        initNettyClient();
+//        scanner = new Scanner(System.in);
+//        Thread.currentThread().setName("主线程");
+//        initCommandMap();
+
         session = new ClientSession();
+        nettyClient = new NettyClient(session);
+        commandClient = new CommandClient(session);
+
     }
 
     private void initCommandMap() {
@@ -151,26 +158,27 @@ public class Client {
     }
 
     private void run() {
-        System.out.println("start to run");
-        while (true) {
-            if (!session.isConnected()) {
-                System.out.println("start to connect");
-                connectToServer();
-            }
-            if (session.needLogin()) {
-                userLogin();
-            } else {
-                System.out.println("channel close do");
-                channel.close();
-                waitCommandThread();
-            }
-            while (session.isLogin())
-            {
-                ChatConsoleCommand command = (ChatConsoleCommand) commandMap.get(ChatConsoleCommand.KEY);
-                command.exec(scanner);
-                startOneChat(command);
-            }
-        }
+        commandClient.start();
+//        System.out.println("start to run");
+//        while (true) {
+//            if (!session.isConnected()) {
+//                System.out.println("start to connect");
+//                connectToServer();
+//            }
+//            if (session.needLogin()) {
+//                userLogin();
+//            } else {
+//                System.out.println("channel close do");
+//                channel.close();
+//                waitCommandThread();
+//            }
+//            while (session.isLogin())
+//            {
+//                ChatConsoleCommand command = (ChatConsoleCommand) commandMap.get(ChatConsoleCommand.KEY);
+//                command.exec(scanner);
+//                startOneChat(command);
+//            }
+//        }
     }
 
     private void startOneChat(ChatConsoleCommand c)
@@ -206,10 +214,10 @@ public class Client {
         waitCommandThread();
     }
 
-    private void connectToServer() {
+    private void connectToServer(GenericFutureListener<ChannelFuture> connectedListener) {
         nettyClient.setHost(Config.HOST);
         nettyClient.setPort(Config.PORT);
-        nettyClient.doConnect();
+        nettyClient.doConnect(connectedListener);
         waitCommandThread();
     }
 
