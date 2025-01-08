@@ -20,40 +20,40 @@ public class LoginProcessor extends AbstractProcessor{
 
     @Override
     public Boolean action(LocalSession session, MessageProto.Message proto) {
-        MessageProto.LoginRequest loginRequest = proto.getLoginRequest();
-        long sequence = proto.getSequence();
-        String uid = loginRequest.getUid();
-        String token = loginRequest.getToken();
-        User user = new User();
-        user.setUserId(uid);
-        user.setToken(token);
-        boolean checkResult = checkUser(user);
-        if (!checkResult) {
-            MessageProto.Message message = MessageProto.Message.newBuilder().setType(MessageProto.HeadType.LOGIN_RESPONSE)
-                    .setSequence(sequence).setSessionId("null")
-                    .setLoginResponse(MessageProto.LoginResponse.newBuilder()
-                            .setResult(false)
-                            .setCode(1)
-                            .setInfo("登录失败")
-                            .setExpose(1).build()).build();
-            session.writeAndFlush(message);
-            System.out.println(message);
-            return false;
-        }
-
-        session.setUser(user);
-        session.bind();
-        sessionManager.addLocalSession(session);
-
-        MessageProto.Message message = MessageProto.Message.newBuilder().setType(MessageProto.HeadType.LOGIN_RESPONSE)
-                .setSequence(sequence).setSessionId(session.getSessionId())
-                .setLoginResponse(MessageProto.LoginResponse.newBuilder()
-                        .setResult(true)
-                        .setCode(0)
-                        .setInfo("success")
-                        .setExpose(1).build()).build();
-        session.writeAndFlush(message);
-        System.out.println(message);
+//        MessageProto.LoginRequest loginRequest = proto.getLoginRequest();
+//        long sequence = proto.getSequence();
+//        String uid = loginRequest.getUid();
+//        String token = loginRequest.getToken();
+////        User user = new User();
+//        user.setUserId(uid);
+//        user.setToken(token);
+//        boolean checkResult = checkUser(user);
+//        if (!checkResult) {
+//            MessageProto.Message message = MessageProto.Message.newBuilder().setType(MessageProto.HeadType.LOGIN_RESPONSE)
+//                    .setSequence(sequence).setSessionId("null")
+//                    .setLoginResponse(MessageProto.LoginResponse.newBuilder()
+//                            .setResult(false)
+//                            .setCode(1)
+//                            .setInfo("登录失败")
+//                            .setExpose(1).build()).build();
+//            session.writeAndFlush(message);
+//            System.out.println(message);
+//            return false;
+//        }
+//
+//        session.setUser(user);
+//        session.bind();
+//        sessionManager.addLocalSession(session);
+//
+//        MessageProto.Message message = MessageProto.Message.newBuilder().setType(MessageProto.HeadType.LOGIN_RESPONSE)
+//                .setSequence(sequence).setSessionId(session.getSessionId())
+//                .setLoginResponse(MessageProto.LoginResponse.newBuilder()
+//                        .setResult(true)
+//                        .setCode(0)
+//                        .setInfo("success")
+//                        .setExpose(1).build()).build();
+//        session.writeAndFlush(message);
+//        System.out.println(message);
 
         return true;
     }

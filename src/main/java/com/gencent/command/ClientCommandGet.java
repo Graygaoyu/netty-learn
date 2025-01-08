@@ -1,5 +1,6 @@
 package com.gencent.command;
 
+import com.gencent.client.ClientSession;
 import lombok.Data;
 
 import java.util.Scanner;
@@ -14,7 +15,7 @@ public class ClientCommandGet implements BaseCommand
     private String commandInput;
 
     @Override
-    public void exec(Scanner scanner)
+    public void exec(Scanner scanner, ClientSession session)
     {
 
         System.err.println("请输入某个操作指令：");

@@ -35,7 +35,7 @@ public class ClientSession {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
-    private ClientState state;
+    private volatile ClientState state;
 
     public ClientSession() {
         state = ClientState.INIT;

@@ -1,14 +1,17 @@
 package com.gencent.sender;
 
+import com.gencent.client.ClientSession;
 import com.gencent.pojo.MessageProto;
 
 public class LoginSender extends BaseSender{
+
+    public LoginSender(ClientSession session) {
+        super(session);
+    }
+
     public void sendLoginMsg()
     {
-        if (!isConnected())
-        {
-            return;
-        }
+        System.out.println(getSession());
         MessageProto.Message message =
                 MessageProto.Message.newBuilder()
                         .setType(MessageProto.HeadType.LOGIN_REQUEST)
@@ -16,8 +19,8 @@ public class LoginSender extends BaseSender{
                         .setSessionId(getSession().getSessionId())
                         .setLoginRequest(
                                 MessageProto.LoginRequest.newBuilder()
-                                        .setUid(getUser().getUserId())
-                                        .setToken(getUser().getToken())
+                                        .setUid(getSession().getUser().getUserId())
+                                        .setToken(getSession().getUser().getToken())
                                         .build())
                         .build();
         System.out.println(message);

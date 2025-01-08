@@ -84,7 +84,7 @@ public class Client {
             System.out.println("connectedListener operationComplete");
             EventLoop eventLoop = channelFuture.channel().eventLoop();
             if (!channelFuture.isSuccess() && session.needConnect()) {
-                eventLoop.schedule(() -> nettyClient.doConnect(),
+                eventLoop.schedule(() -> nettyClient.connect(),
                         10,
                         TimeUnit.SECONDS);
                 session.incrementConnectCount();
@@ -137,7 +137,6 @@ public class Client {
 //        initCommandMap();
 
         session = new ClientSession();
-        nettyClient = new NettyClient(session);
         commandClient = new CommandClient(session);
 
     }
@@ -153,9 +152,9 @@ public class Client {
         commandMap.put(logoutConsoleCommand.getKey(), logoutConsoleCommand);
     }
 
-    private void initNettyClient() {
-        nettyClient = new NettyClient(connectedListener, this);
-    }
+//    private void initNettyClient() {
+//        nettyClient = new NettyClient(connectedListener, this);
+//    }
 
     private void run() {
         commandClient.start();
@@ -181,35 +180,35 @@ public class Client {
 //        }
     }
 
-    private void startOneChat(ChatConsoleCommand c)
-    {
-        //登录
-        if (!session.isLogin())
-        {
-            return;
-        }
-        chatSender = new ChatSender();
-        chatSender.setSession(session);
-        chatSender.setUser(user);
-        chatSender.sendChatMsg(c.getToUserId(), c.getMessage());
-
-    }
+//    private void startOneChat(ChatConsoleCommand c)
+//    {
+//        //登录
+//        if (!session.isLogin())
+//        {
+//            return;
+//        }
+//        chatSender = new ChatSender();
+//        chatSender.setSession(session);
+//        chatSender.setUser(user);
+//        chatSender.sendChatMsg(c.getToUserId(), c.getMessage());
+//
+//    }
 
     private void userLogin() {
         LoginConsoleCommand loginConsoleCommand = (LoginConsoleCommand) commandMap.get(LoginConsoleCommand.KEY);
-        loginConsoleCommand.exec(scanner);
-        User user = new User();
-        user.setUserId(loginConsoleCommand.getUserName());
-        user.setToken(loginConsoleCommand.getPassword());
-        System.out.println("user " + user);
-        System.out.println("start to login");
-        this.user = user;
-        session.setUser(user);
+//        loginConsoleCommand.exec(scanner);
+//        User user = new User();
+//        user.setUserId(loginConsoleCommand.getUserName());
+//        user.setToken(loginConsoleCommand.getPassword());
+//        System.out.println("user " + user);
+//        System.out.println("start to login");
+//        this.user = user;
+//        session.setUser(user);
 
-        loginSender = new LoginSender();
-        loginSender.setUser(user);
-        loginSender.setSession(session);
-        loginSender.sendLoginMsg();
+//        loginSender = new LoginSender();
+//        loginSender.setUser(user);
+//        loginSender.setSession(session);
+//        loginSender.sendLoginMsg();
 
         waitCommandThread();
     }
@@ -217,7 +216,7 @@ public class Client {
     private void connectToServer(GenericFutureListener<ChannelFuture> connectedListener) {
         nettyClient.setHost(Config.HOST);
         nettyClient.setPort(Config.PORT);
-        nettyClient.doConnect(connectedListener);
+        nettyClient.connect();
         waitCommandThread();
     }
 

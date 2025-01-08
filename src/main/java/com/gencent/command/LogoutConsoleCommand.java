@@ -1,5 +1,7 @@
 package com.gencent.command;
 
+import com.gencent.client.ClientSession;
+
 import java.util.Scanner;
 
 public class LogoutConsoleCommand implements BaseCommand
@@ -7,7 +9,7 @@ public class LogoutConsoleCommand implements BaseCommand
     public static final String KEY = "10";
 
     @Override
-    public void exec(Scanner scanner)
+    public void exec(Scanner scanner, ClientSession session)
     {
 
     }

@@ -1,5 +1,7 @@
 package com.gencent.command;
 
+import com.gencent.client.Client;
+import com.gencent.client.ClientSession;
 import lombok.Data;
 
 import java.util.Scanner;
@@ -12,7 +14,7 @@ public class ChatConsoleCommand implements BaseCommand {
     public static final String KEY = "2";
 
     @Override
-    public void exec(Scanner scanner) {
+    public void exec(Scanner scanner, ClientSession session) {
         System.out.println("请输入聊天信息，格式为：内容@用户名 ");
 
         while (true) {

@@ -1,8 +1,14 @@
 package com.gencent.sender;
 
+import com.gencent.client.ClientSession;
 import com.gencent.pojo.MessageProto;
 
 public class ChatSender extends BaseSender {
+
+    public ChatSender(ClientSession session) {
+        super(session);
+    }
+
     public void sendChatMsg(String toUid, String content) {
         MessageProto.Message message =
                 MessageProto.Message.newBuilder()
@@ -12,7 +18,7 @@ public class ChatSender extends BaseSender {
                         .setMessageRequest(
                                 MessageProto.MessageRequest.newBuilder()
                                         .setMsgId(1L)
-                                        .setFrom(getUser().getUserId())
+//                                        .setFrom(getUser().getUserId())
                                         .setTo(toUid)
                                         .setTime(System.currentTimeMillis())
                                         .setMsgType(1)

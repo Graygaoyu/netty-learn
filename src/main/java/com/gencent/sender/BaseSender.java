@@ -13,9 +13,11 @@ import lombok.Data;
 @Data
 public abstract class BaseSender {
 
-    private User user;
+    public BaseSender(ClientSession session) {
+        this.session = session;
+    }
 
-    private ClientSession session;
+    private volatile ClientSession session;
 
     public boolean isConnected()
     {
